@@ -13,51 +13,6 @@ def recordMilk(id, milk):    # number of operations = 3
   listCows[id]['averageMilkProd'] = (listCows[id]['totalMilkProd']) / listCows[id]['milkings']
   return
 
-def buildLowestWeightsDict():
-  #-------#------- 
-  # Sorting based on lowest weight
-  
-  sortedLowestWeightList = sorted(newList, key = lambda item: item['lowest']) # 1
-  for i in sortedLowestWeightList: # number of operations = c + 7
-    lowest = i['lowest']
-    if lowest in sortedWeightDict:
-      sortedWeightDict[lowest]['cowLowestData'].append({'id':i['id'],'latest':i['latest'],'milk':i['milk']})
-
-      
-      lowestWeightDuplicates.append(lowest)
-    else:
-      cowDataList = [{'id':i['id'],'latest':i['latest'],'milk':i['milk']}]
-      sortedWeightDict[lowest] = {
-      'cowLowestData': cowDataList
-    }
-  
-  #-------#-------
-  # Sorting lowest weight duplicates by latest weight
-
-  
-  for i in lowestWeightDuplicates: 
-
-    sortedWeightDict[i]['cowLowestData'] = sorted(sortedWeightDict[i]['cowLowestData'], key = lambda item: item['latest'])
-
-    print(sortedWeightDict[i]['cowLowestData'])
-    newNode = {}
-    newNodeLatest = []
-    
-    for j in sortedWeightDict[i]['cowLowestData']:
-      newNodeLatest.append({'id':j['id'],'milk':j['milk']})
-      newNode[j['latest']] = {
-        'cowLatestData': newNodeLatest
-      }
-    
-    for latestWeight in newNode.values():
-      
-      latestWeight['cowLatestData'] = sorted(latestWeight['cowLatestData'], key = lambda item: item['milk'])
-    
-    sortedWeightDict[i] = newNode
-  
-  return 
-
-
 
 with open('cowData4.txt') as file:
   contents = file.read()
@@ -91,15 +46,62 @@ with open('cowData4.txt') as file:
       newList.append({'id':c[0],'lowest':c[1]['lowestWeight'],'latest':c[1]['latestWeight'],'milk':c[1]['averageMilkProd']})
 
 
-sortedWeightDict = {}
+sortedCowList = sorted(newList, key = lambda item: item['lowest'])
 
-lowestWeightDuplicates = []   # Tracks items with duplicate lowest weights to later sort latest weights
+sortingLatestWeight = []
+cowRecords = len(sortedCowList)
 
-buildLowestWeightsDict()
+for i in range(cowRecords):
+  sortingLatestWeight = []
+  sortedCowListDuplicates = []
+  #print(sortedCowList[i]['lowest'])
+  if i < cowRecords-1:
+    if sortedCowList[i]['lowest'] == sortedCowList[i+1]['lowest']: 
+        # check for duplicate lowest weight in the next index
+      j = i
+      while sortedCowList[j]['lowest'] == sortedCowList[i]['lowest']:    
+          # if duplicate found, record duplicates until non duplicate is found
+        sortingLatestWeight.append(sortedCowList[j])  # copy duplicates into new list
+        j = j+1
+      sortedCowListDuplicates = sorted(sortingLatestWeight, key = lambda item: item['latest']) 
+        # sort the  duplicate *lowest weights* by their *latest weight*
+      cowLatestDuplicates = len(sortedCowListDuplicates)
 
-#for key in sortedWeightDict.values():
-  #print(key)
-  
-#with open('output.txt', 'w') as f:
-#    f.write(output)
+      print('yeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+      
+      
+      for k in range(cowLatestDuplicates):
+        sortMilkProd = []
+        sortingMilk = []
+        if k < cowLatestDuplicates-1:
+          
+          #print(sortedCowListDuplicates[k])
+          if sortedCowListDuplicates[k]['latest'] == sortedCowListDuplicates[k+1]['latest']:
+            print('hi')
+            l = k
+            while sortedCowListDuplicates[k]['latest'] == sortedCowListDuplicates[l]['latest']:
+              print('bruh')
+              sortingMilk.append(sortedCowListDuplicates[l])
+              l=l+1
+            sortMilkProd = sorted(sortingMilk, key = lambda item: item['milk'])
+            print(k,l)
+            sortedCowListDuplicates[k+1:l] = sortMilkProd
+            print('dups',sortedCowListDuplicates)
+            print('milksort',sortMilkProd)
+        # now, check for duplicate latest weights and sort by thier milk production
+
+      #sortedCowListDuplicates[k:l] = sortMilkProd
+      #print(sortMilkProd)
+      #print(sortedCowListDuplicates)
+      
+      sortedCowList[i:j] = sortedCowListDuplicates
+      i=j-1
+      
+      # insert similar lowest weights back into the original sorted list, sorted by thier latest weights
     
+      
+
+# check for duplicate lowest weights
+#for x in sortedCowList:
+ # print(x)
+  
